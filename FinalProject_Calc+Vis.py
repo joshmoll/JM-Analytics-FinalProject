@@ -34,7 +34,7 @@ def calc_percent_decrease(feb_table, apr_table, cur, conn):
             feb_airline_dict[airline] += 1
     
     feb_total = sum(feb_airline_dict.values())                          #find avg number of flights per day. 
-    print(feb_total)
+    #print(feb_total)
     feb_average = feb_total/7
     
 
@@ -48,14 +48,14 @@ def calc_percent_decrease(feb_table, apr_table, cur, conn):
             apr_airline_dict[airline] += 1
 
     apr_total = sum(apr_airline_dict.values())                          #find avg number of flights per day.
-    print(apr_total)
+    #print(apr_total)
     apr_average = apr_total/7
 
 
     difference = apr_average - feb_average                              #apply percent decrease equation
     decimal_value = difference / feb_average                                
     percent_decrease = (decimal_value * 100) * -1
-    print(percent_decrease)
+    #print(percent_decrease)
     print("There was a " + str(percent_decrease) + "% percent decrease in flights leaving JFK in April compared to Februrary")
 
 def graph_Totaldata():
@@ -81,7 +81,6 @@ def graph_Totaldata():
 
     plt.xticks(rotation = 90, fontsize = 8, fontname = "Times New Roman")
 
-
     plt.title("Total Flights out of JFK ((February 7th, 5pm - February 14th, 5pm and April 7th, 5pm - April 14th, 5pm")
     plt.ylabel("Flights")
     plt.xlabel("Airline")
@@ -89,25 +88,11 @@ def graph_Totaldata():
     plt.legend()
     plt.show()
    
-
-    #for tick in feb_columns[1::2]:
-     #   tick.set_pad(15)
-
 def main():
     
     cur, conn = setUpDatabase('flights.db')
     calc_percent_decrease("totalFebFlights", "totalAprilFlights", cur, conn)
-    #graph_Totaldata()
-
-
-   
-    feb_json_data = ReadDataFromApi("1581098400","1581703200")
-    #setUpFebFlightsTable(feb_json_data, cur, conn)
-
-    apr_json_data = ReadDataFromApi("1586278800", "1586883600")  
-    #setUpAprilFlightsTable(apr_json_data, cur, conn)
-
-    #SQL_calc(feb_json_data, cur, conn)
+    graph_Totaldata()
 
 if __name__ == "__main__":
     main()
