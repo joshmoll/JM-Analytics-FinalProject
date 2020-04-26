@@ -58,6 +58,9 @@ def calc_percent_decrease(feb_table, apr_table, cur, conn):
     #print(percent_decrease)
     print("There was a " + str(percent_decrease) + "% percent decrease in flights leaving JFK in April compared to Februrary")
 
+    with open("Percent_decrease.txt", "w") as outfile:
+        outfile.write(str(percent_decrease))
+
 def graph_Totaldata():
     apr_columns = ["DAL", "AAL", "ASA", "AAR", "FRH", "JBU", "EDV", "N92", "ATN", "FDX", "UPS", "DHK", "THY", "RPA", "N56", "N91", "CLX", "SLQ",
     "KAL", "GEC", "ABX", "VIR", "SV8", "BAW", "CPA", "AFR", "KLM", "EVA", "EIN", "AZA", "GTI", "CAO", "QFA", "CAL", "ELY", "SOO", "N97", "EEV",
