@@ -58,7 +58,7 @@ def setUpAprilFlightsTable(data, cur, conn):
     for flight in data: 
         if count == 20:
             break
-        x = flight["callsign"]                            #Counter by 20, select data, see if its in database, if not then add count
+        x = flight["callsign"]                           
         cur.execute("SELECT callsign FROM AprilFlights WHERE callsign = ?", (x,))
         callsign_test = cur.fetchone()
         if callsign_test:
@@ -70,31 +70,60 @@ def setUpAprilFlightsTable(data, cur, conn):
         
     conn.commit()
 
-#create a dictionary that returns each airline_name as the keys and the values as flight frequency
-def data_flight_count(table_name, cur, conn):
-    cur.execute("SELECT airline_name FROM {}".format(table_name))
-    all_rows = cur.fetchall()
-    airline_dict = {}
-    for airline in all_rows:
-        if airline not in airline_dict:
-            airline_dict[airline] = 1
-        else:
-            airline_dict[airline] += 1
-    return airline_dict
+def setUptotalFebFlightsTable(data, cur, conn):
 
-    
+    cur.execute("DROP TABLE totalFebFlights")
+    cur.execute("CREATE TABLE IF NOT EXISTS totalFebFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, date INTEGER, departure_airport TEXT, intended_arrival_airport TEXT)")
+
+    airline_list = []
+    count = 0
+    for flight in data:
+        if count == 200:
+            break
+        x = flight["callsign"]
+        cur.execute("SELECT callsign FROM totalFebFlights WHERE callsign = ?", (x,))
+        callsign_test = cur.fetchone()
+        if callsign_test:
+            continue
+        else:
+            cur.execute("INSERT OR IGNORE INTO totalFebFlights (callsign, airline_name, date, departure_airport, intended_arrival_airport) VALUES (?, ?, ?, ?, ?)", (flight["callsign"], flight["callsign"][0:3], flight["lastSeen"], flight["estDepartureAirport"], flight["estArrivalAirport"]))  
+            airline_list.append(flight)
+            count += 1
+
+    conn.commit()
+
+#Create the AprilFlights table within the database, include a column for callsign as primary key, airline_name, date, departure airport, and intended arrival airport
+def setUptotalAprilFlightsTable(data, cur, conn):
+
+    cur.execute("DROP TABLE totalAprilFlights")
+    cur.execute("CREATE TABLE IF NOT EXISTS totalAprilFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, date INTEGER, departure_airport TEXT, intended_arrival_airport TEXT)")
+
+    airline_list = []         
+    count = 0
+    for flight in data: 
+        if count == 200:
+            break
+        x = flight["callsign"]                            
+        cur.execute("SELECT callsign FROM totalAprilFlights WHERE callsign = ?", (x,))
+        callsign_test = cur.fetchone()
+        if callsign_test:
+            continue
+        else:
+            cur.execute("INSERT OR IGNORE INTO totalAprilFlights (callsign, airline_name, date, departure_airport, intended_arrival_airport) VALUES (?, ?, ?, ?, ?)", (flight["callsign"], flight["callsign"][0:3], flight["lastSeen"], flight["estDepartureAirport"], flight["estArrivalAirport"])) #apply category id here
+            airline_list.append(flight)
+            count += 1
+        
     conn.commit()
     conn.close()
 
 def main():
     cur, conn = setUpDatabase('flights.db')
+
     feb_json_data = ReadDataFromApi("1581098400","1581703200")
     setUpFebFlightsTable(feb_json_data, cur, conn)
 
     apr_json_data = ReadDataFromApi("1586278800", "1586883600")  
     setUpAprilFlightsTable(apr_json_data, cur, conn)
-
-    data_flight_count("FebFlights", cur, conn)
-
+    
 if __name__ == "__main__":
     main()
