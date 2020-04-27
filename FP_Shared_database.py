@@ -14,8 +14,8 @@ def ReadDataFromApi(begin, end):
     password = "206finalproject"
     base_url = "@opensky-network.org/api/flights/departure?"
     new_url = "https://" + username + ":" + password + base_url + "airport=KJFK" + "&" + "begin={}".format(begin) + "&" + "end={}".format(end)   
-    apr_json_data = requests.get(new_url).json()
-    return apr_json_data
+    json_data = requests.get(new_url).json()
+    return json_data
 
 def API_data_retrieval():
     base_url = "https://energ.ee/covid19-us-api/states.json"
@@ -34,7 +34,7 @@ def setUpDatabase(db_name):
 #Create the FebFlights table within the database, include a column for callsign as primary key, airline_name, date, departure airport, and intended arrival airport
 def setUpFebFlightsTable(data, cur, conn):
 
-    #cur.execute("DROP TABLE FebFlights")
+    cur.execute("DROP TABLE FebFlights")
     cur.execute("CREATE TABLE IF NOT EXISTS FebFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, departure_airport TEXT, intended_arrival_airport TEXT)")
 
     airline_list = []
@@ -57,7 +57,7 @@ def setUpFebFlightsTable(data, cur, conn):
 #Create the AprilFlights table within the database, include a column for callsign as primary key, airline_name, date, departure airport, and intended arrival airport
 def setUpAprilFlightsTable(data, cur, conn):
 
-    #cur.execute("DROP TABLE AprilFlights")
+    cur.execute("DROP TABLE AprilFlights")
     cur.execute("CREATE TABLE IF NOT EXISTS AprilFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, departure_airport TEXT, intended_arrival_airport TEXT)")
 
     airline_list = []         
@@ -86,7 +86,7 @@ def share_key(cur):
 #This table will load all the February data by 200, useful for visualization and calculations
 def setUpTotalFebFlightsTable(data, cur, conn):
 
-    #cur.execute("DROP TABLE totalFebFlights")
+    cur.execute("DROP TABLE totalFebFlights")
     cur.execute("CREATE TABLE IF NOT EXISTS totalFebFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, departure_airport TEXT, intended_arrival_airport TEXT)")
 
     airline_list = []
@@ -110,7 +110,7 @@ def setUpTotalFebFlightsTable(data, cur, conn):
 #This table will load all the April data by 200, useful for visualization and calculations
 def setUpTotalAprilFlightsTable(data, cur, conn):
 
-    #cur.execute("DROP TABLE totalAprilFlights")
+    cur.execute("DROP TABLE totalAprilFlights")
     cur.execute("CREATE TABLE IF NOT EXISTS totalAprilFlights (callsign TEXT PRIMARY KEY, airline_name TEXT, departure_airport TEXT, intended_arrival_airport TEXT)")
 
     airline_list = []         
@@ -132,8 +132,8 @@ def setUpTotalAprilFlightsTable(data, cur, conn):
     conn.commit()
 
 def case_info_setup(case_data, cur, conn):
-    #cur.execute('DROP TABLE case_info')
-    cur.execute("CREATE TABLE IF NOT EXISTS case_info (Date TEXT PRIMARY KEY, February TEXT NULL, April TEXT)")
+    cur.execute('DROP TABLE case_info')
+    cur.execute("CREATE TABLE IF NOT EXISTS case_info (Date TEXT PRIMARY KEY, April TEXT)")
     NY_cases = []
     count = 0
     for key in case_data['New York']:
@@ -149,15 +149,6 @@ def case_info_setup(case_data, cur, conn):
             NY_cases.append(key)
             count += 1
     conn.commit()
-
-def april_dates(cur, conn):
-    cur.execute('SELECT Date FROM case_info limit 37, 44')
-    april_dates = cur.fetchall()
-    
-
-def april_cases(cur, conn):
-    cur.execute('SELECT April FROM case_info limit 37, 44')
-    april_cases = cur.fetchall()
 
 def main():
     cur, conn = setUpDatabase('flights.db')
@@ -179,10 +170,6 @@ def main():
     
     NY_json_data = API_data_retrieval()
     case_info_setup(NY_json_data, cur, conn)
-    april_dates(cur, conn)
-    april_cases(cur, conn)
-
-
 
 if __name__ == "__main__":
     main()
