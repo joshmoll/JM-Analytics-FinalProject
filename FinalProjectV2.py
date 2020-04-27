@@ -70,6 +70,11 @@ def setUpAprilFlightsTable(data, cur, conn):
         
     conn.commit()
 
+def share_key(cur):
+    cur.execute("SELECT totalFebFlights.callsign, totalAprilFlights.callsign, totalFebFlights.intended_arrival_airport, totalAprilFlights.intended_arrival_airport FROM totalFebFlights JOIN totalAprilFlights ON totalFebFlights.callsign = totalAprilFlights.callsign")
+    rows = cur.fetchall()
+    print(rows)
+
 def setUptotalFebFlightsTable(data, cur, conn):
 
     cur.execute("DROP TABLE totalFebFlights")
@@ -124,6 +129,8 @@ def main():
 
     apr_json_data = ReadDataFromApi("1586278800", "1586883600")  
     setUpAprilFlightsTable(apr_json_data, cur, conn)
-    
+
+    share_key(cur)
+
 if __name__ == "__main__":
     main()
